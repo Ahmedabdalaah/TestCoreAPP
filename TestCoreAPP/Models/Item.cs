@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
 
 namespace TestCoreAPP.Models
 {
@@ -13,6 +14,9 @@ namespace TestCoreAPP.Models
         [Required]
         public decimal Price { get; set; }
         public DateTime CreatedTime { get; set; } = DateTime.Now;
+        public string? imagePath { get; set; }
+        [NotMapped]
+        public IFormFile clientFile {  get; set; }   
         [Required]  
         [ForeignKey("categories")]
         [DisplayName ("Category")]

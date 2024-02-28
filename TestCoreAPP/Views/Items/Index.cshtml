@@ -16,6 +16,7 @@
             <th>Id</th>
             <th>Item</th>
             <th>Price</th>
+            <th>image path</th>
             <th>Date Time</th>
         </tr>
     </thead>
@@ -31,6 +32,9 @@
                 </td>
                 <td>
                     @item.Price
+                </td>
+                <td>
+                   <img src="~/images/@item.imagePath" style="width:30px" class="img-thumbnail"/>
                 </td>
                 <td>
                     @item.CreatedTime

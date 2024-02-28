@@ -1,21 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol.Core.Types;
 using TestCoreAPP.Models;
 using TestCoreAPP.Repository.@base;
 
 namespace TestCoreAPP.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
-        public CategoryController(IRepository<Categories> reository)
+        public CategoryController(IunitOfWork _myUnit)
         {
-            _reository = reository;
+            myUnit=_myUnit;
         } 
-        private IRepository<Categories> _reository;
+        private readonly IunitOfWork myUnit;
         public async Task <IActionResult> Index()
         {
-            var one = _reository.SelectOne(x => x.Name == "Computers");
-            var all = await _reository.FindAllAsync("Items"); 
+            var one = myUnit.categories.SelectOne(x => x.Name == "Computers");
+            var all = await myUnit.categories.FindAllAsync("Items"); 
             return View( all);
         }
         //GET
@@ -28,7 +30,7 @@ namespace TestCoreAPP.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddCat(Categories categories)
         {
-            _reository.addCat(categories);
+            myUnit.categories.addCat(categories);
             return RedirectToAction("Index");
         }
 
@@ -39,7 +41,7 @@ namespace TestCoreAPP.Controllers
             {
                 return NotFound();
             }
-            var category = _reository.GetById(id.Value);
+            var category = myUnit.categories.GetById(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -53,7 +55,7 @@ namespace TestCoreAPP.Controllers
         {
             if (ModelState.IsValid)
             {
-                _reository.updateCat(categories);
+                myUnit.categories.updateCat(categories);
                 return RedirectToAction("Index");
             }
             else
@@ -68,7 +70,7 @@ namespace TestCoreAPP.Controllers
             {
                 return NotFound();
             }
-            var category = _reository.GetById(id.Value);
+            var category = myUnit.categories.GetById(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -80,7 +82,7 @@ namespace TestCoreAPP.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteCat(Categories categories)
         {
-            _reository.deleteCat(categories);
+            myUnit.categories.deleteCat(categories);
             TempData["successData"] = "Category has been deleted successfully";
             return RedirectToAction("Index");
         }

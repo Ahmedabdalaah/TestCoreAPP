@@ -1,16 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TestCoreAPP.Data;
 using TestCoreAPP.Models;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace TestCoreAPP.Controllers
 {
-    public class ItemsController : Controller
+    [Authorize]
+    public class ItemsController : Controller 
     {
         private readonly AppDBContext _db;
-        public ItemsController(AppDBContext db)
+        private readonly IHostingEnvironment _host;
+        public ItemsController(AppDBContext db , IHostingEnvironment host)
         {
             _db = db;   
+            _host = host;
         }
         public IActionResult Index()
         {
@@ -32,8 +37,18 @@ namespace TestCoreAPP.Controllers
             {
                 ModelState.AddModelError("Name", "Change item name ");
             }
+            string fileName = string.Empty;
             if(ModelState.IsValid)
             {
+                if(item.clientFile != null)
+                {
+                    string upload = Path.Combine(_host.WebRootPath, "images");
+                    fileName = item.clientFile.FileName;
+                    string filePath= Path.Combine(upload, fileName);
+                    item.clientFile.CopyTo(new FileStream(filePath, FileMode.Create));
+                    item.imagePath = fileName;
+
+                }
                 _db.items.Add(item);
                 _db.SaveChanges();
                 TempData["success"] = "you have bedn added data successfully";
